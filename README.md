@@ -1,2 +1,3 @@
 # URA
-Uvod u računarske algoritme
+
+Ovo je repozitorija za predmet Uvod u računarske algoritme (URA).

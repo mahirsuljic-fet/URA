@@ -30,7 +30,7 @@ class Test
         {
           int n = get_rand(1, MAX_RAND_P);
           T result = prod_even(n);
-          std::cout << "Proizvod parnih prirodnih brojeva do " << std::left << std::setw(2) << n << " je " << std::setw(80) << result << (result == check_prod<T>(n) ? " (T)" : " (F)") << std::endl;
+          std::cout << "Proizvod parnih prirodnih brojeva do " << std::left << std::setw(2) << n << " je " << std::setw(85) << result << (result == check_prod<T>(n) ? " (T)" : " (F)") << std::endl;
         }
         catch (const std::exception& err)
         {

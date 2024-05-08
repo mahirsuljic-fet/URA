@@ -1,9 +1,6 @@
 #include "../tests.hpp"
 #include <boost/multiprecision/cpp_int.hpp>
-#include <cstddef>
-#include <exception>
 #include <iostream>
-#include <stdexcept>
 
 using bint = boost::multiprecision::cpp_int;
 

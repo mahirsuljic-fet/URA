@@ -33,7 +33,7 @@ class Test
 
     static std::vector<int> random_vector();
     template <typename F>
-    static void test(F sort);
+    static void test(F sort, int examples = 5);
     static bool check_sorted(It begin, It end);
     template <typename C>
     static bool check_sorted(It begin, It end, C comp);
@@ -55,25 +55,30 @@ class Test
 
 template <typename It>
 template <typename F>
-void Test<It>::test(F sort)
+void Test<It>::test(F sort, int examples)
 {
-  auto vec = Test<>::random_vector();
-  auto vec_copy = vec;
-  auto comp_l = [](int lhs, int rhs) { return lhs < rhs; };
-  auto comp_g = [](int lhs, int rhs) { return lhs > rhs; };
+  for (int i = 1; i <= examples; ++i)
+  {
+    auto vec = Test<>::random_vector();
+    auto vec_copy = vec;
+    auto comp_l = [](int lhs, int rhs) { return lhs < rhs; };
+    auto comp_g = [](int lhs, int rhs) { return lhs > rhs; };
 
-  std::cout << "Original:  ";
-  Test<>::print(vec.begin(), vec.end());
+    std::cout << "Original:  ";
+    Test<>::print(vec.begin(), vec.end());
 
-  sort(vec.begin(), vec.end(), comp_l);
+    sort(vec.begin(), vec.end(), comp_l);
 
-  std::cout << "Sort asc:  ";
-  Test<>::print_check(vec.begin(), vec.end(), comp_l);
+    std::cout << "Sort asc:  ";
+    Test<>::print_check(vec.begin(), vec.end(), comp_l);
 
-  sort(vec_copy.begin(), vec_copy.end(), comp_g);
+    sort(vec_copy.begin(), vec_copy.end(), comp_g);
 
-  std::cout << "Sort desc: ";
-  Test<>::print_check(vec_copy.begin(), vec_copy.end(), comp_g);
+    std::cout << "Sort desc: ";
+    Test<>::print_check(vec_copy.begin(), vec_copy.end(), comp_g);
+    if (i != examples)
+      std::cout << std::endl;
+  }
 }
 
 template <typename It>

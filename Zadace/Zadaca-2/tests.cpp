@@ -12,7 +12,6 @@ int get_rand(int min, int max)
 template <>
 std::vector<int> Test<>::random_vector()
 {
-  std::srand(std::time(NULL));
   int size = MIN_ARR_SIZE + (std::rand() % (MAX_ARR_SIZE - MIN_ARR_SIZE + 1));
   std::vector<int> arr(size);
   for (auto& el : arr)

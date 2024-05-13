@@ -1,11 +1,13 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <ostream>
+#include <sstream>
 #include <thread>
 #include <vector>
 
@@ -27,18 +29,18 @@ class Test
     constexpr static const int MAX_ARR_VALUE = 100;
 
     static int get_rand(int min, int max);
-
-  public:
-    constexpr static const size_t DEFAULT_DELAY = 250;
-
     static std::vector<int> random_vector();
-    template <typename F>
-    static void test(F sort, int examples = 5);
     static bool check_sorted(It begin, It end);
     template <typename C>
     static bool check_sorted(It begin, It end, C comp);
     template <typename C>
-    static void print_check(It begin, It end, C comp, int w = DEFAULT_W);
+    static void print_check(It begin, It end, C comp, int max_w, int w = DEFAULT_W);
+
+  public:
+    constexpr static const size_t DEFAULT_DELAY = 250;
+
+    template <typename F>
+    static void test(F sort, int examples = 5);
     static void print(It begin, It end, int w = DEFAULT_W, const std::string& empty_str = DEFAULT_EMPTY);
     static void print(It begin, It end, It it, const std::string& text = "^", int w = DEFAULT_W, const std::string& empty_str = DEFAULT_EMPTY);
     template <typename... T>
@@ -57,9 +59,18 @@ template <typename It>
 template <typename F>
 void Test<It>::test(F sort, int examples)
 {
-  for (int i = 1; i <= examples; ++i)
+  std::srand(std::time(NULL));
+
+  std::vector<std::vector<int>> random_vectors;
+  random_vectors.reserve(examples);
+  for (int i = 0; i < examples; ++i)
+    random_vectors.push_back(random_vector());
+
+  int max_w = std::max_element(random_vectors.begin(), random_vectors.end(), [](const auto& lhs, const auto& rhs) { return lhs.size() < rhs.size(); })->size() * DEFAULT_W + 2;
+
+  for (int i = 0; i < examples; ++i)
   {
-    auto vec = Test<>::random_vector();
+    auto& vec = random_vectors[i];
     auto vec_copy = vec;
     auto comp_l = [](int lhs, int rhs) { return lhs < rhs; };
     auto comp_g = [](int lhs, int rhs) { return lhs > rhs; };
@@ -70,24 +81,26 @@ void Test<It>::test(F sort, int examples)
     sort(vec.begin(), vec.end(), comp_l);
 
     std::cout << "Sort asc:  ";
-    Test<>::print_check(vec.begin(), vec.end(), comp_l);
+    Test<>::print_check(vec.begin(), vec.end(), comp_l, max_w);
 
     sort(vec_copy.begin(), vec_copy.end(), comp_g);
 
     std::cout << "Sort desc: ";
-    Test<>::print_check(vec_copy.begin(), vec_copy.end(), comp_g);
-    if (i != examples)
+    Test<>::print_check(vec_copy.begin(), vec_copy.end(), comp_g, max_w);
+    if (i != examples - 1)
       std::cout << std::endl;
   }
 }
 
 template <typename It>
 template <typename C>
-void Test<It>::print_check(It begin, It end, C comp, int w)
+void Test<It>::print_check(It begin, It end, C comp, int max_w, int w)
 {
+  std::ostringstream oss;
   for (It it = begin; it != end; ++it)
-    std::cout << std::setw(w) << *it;
-  std::cout << (Test<>::check_sorted(begin, end, comp) ? "\t(T)" : "\t(F)") << std::endl;
+    oss << std::setw(w) << std::right << *it;
+
+  std::cout << std::setw(max_w) << std::left << oss.str() << (Test<>::check_sorted(begin, end, comp) ? "(T)" : "(F)") << std::endl;
 
   last_begin_ = It {};
   pairs_.clear();
@@ -97,7 +110,7 @@ template <typename It>
 void Test<It>::print(It begin, It end, int w, const std::string& empty_str)
 {
   for (It it = begin; it != end; ++it)
-    std::cout << std::setw(w) << *it;
+    std::cout << std::setw(w) << std::right << *it;
   std::cout << std::endl;
 
   if (begin == last_begin_ && pairs_.size())
